@@ -9,17 +9,21 @@ import os
 import itertools
 import string
 
+# -------- Logging des essais --------
+def log_attempt(password):
+    with open("bruteforce_attempts.log", "a") as log_file:
+        log_file.write(password + "\n")
+
 # -------- Banner --------
 def show_banner():
     cprint(r"""
- █████╗  █████╗       ██████╗ ██████╗       ██████╗ ██████╗
-██╔══██╗██╔══██╗     ██╔═══██╗██╔══██╗     ██╔════╝██╔═══██╗
-███████║███████║     ██║   ██║██████╔╝     ██║     ██║   ██║
-██╔══██║██╔══██║     ██║   ██║██╔═══╝      ██║     ██║   ██║
-██║  ██║██║  ██║     ╚██████╔╝██║          ╚██████╗╚██████╔╝
-╚═╝  ╚═╝╚═╝  ╚═╝      ╚═════╝ ╚═╝           ╚═════╝ ╚═════╝
-
-            Version 1.0.0 | Port Scanner + Zip Cracker
+     █████╗  █████╗     ██████╗  ██████╗      ██████╗ ██████╗      
+    ██╔══██╗██╔══██╗    ██╔══██╗██╔═══██╗    ██╔════╝██╔═══██╗     
+    ███████║███████║    ██████╔╝██║   ██║    ██║     ██║   ██║     
+    ██╔══██║██╔══██║    ██╔═══╝ ██║   ██║    ██║     ██║   ██║     
+    ██║  ██║██║  ██║    ██║     ╚██████╔╝    ╚██████╗╚██████╔╝     
+    ╚═╝  ╚═╝╚═╝  ╚═╝    ╚═╝      ╚═════╝      ╚═════╝ ╚═════╝      
+                Version 1.0.0 | Port Scanner + Zip Cracker
     """, 'red')
 
 # -------- Port Scanner --------
@@ -45,8 +49,9 @@ def crack_zip(zip_path, wordlist_path):
                 for line in f:
                     password = line.strip()
                     try:
+                        print(f"[-] Test : {password.decode(errors='ignore')}"); log_attempt(password.decode(errors='ignore'))
                         zf.extractall(pwd=password)
-                        cprint(f"[+] Password found: {password.decode()}", "red")
+                        cprint(f"[+] Password found: {password.decode()}", "green")
                         return True
                     except:
                         pass
@@ -66,8 +71,9 @@ def crack_zip_exhaustive(zip_path, max_length=4):
                 for pwd_tuple in itertools.product(chars, repeat=length):
                     password = ''.join(pwd_tuple)
                     try:
+                        print(f"[-] Test : {password}"); log_attempt(password)
                         zf.extractall(pwd=bytes(password, 'utf-8'))
-                        cprint(f"[+] Mot de passe trouvé : {password}", "red")
+                        cprint(f"[+] Mot de passe trouvé : {password}", "green")
                         return True
                     except:
                         continue
@@ -76,28 +82,6 @@ def crack_zip_exhaustive(zip_path, max_length=4):
         print("[-] Fichier ZIP introuvable.")
     return False
 
-# -------- Générer un ZIP protégé --------
-def create_protected_zip():
-    try:
-        import pyminizip
-    except ImportError:
-        print("[-] Le module 'pyminizip' est requis. Installe-le avec : pip install pyminizip")
-        return
-
-    file_path = input("Chemin du fichier à zipper : ")
-    if not os.path.isfile(file_path):
-        print("[-] Fichier introuvable.")
-        return
-
-    zip_name = input("Nom du fichier ZIP de sortie : ")
-    password = input("Mot de passe : ")
-
-    try:
-        pyminizip.compress(file_path, None, zip_name, password, 5)
-        cprint(f"[+] ZIP protégé créé : {zip_name}", "red")
-    except Exception as e:
-        print(f"[-] Erreur : {e}")
-
 # -------- Menu Interface --------
 def main():
     show_banner()
@@ -105,8 +89,7 @@ def main():
         print("\nMenu:")
         print("1. Scanner des ports")
         print("2. Bruteforce de fichier ZIP")
-        print("3. Générer un ZIP protégé par mot de passe")
-        print("4. Quitter")
+        print("3. Quitter")
         choice = input("\n[?] Choix: ")
 
         if choice == '1':
@@ -129,9 +112,6 @@ def main():
                 crack_zip_exhaustive(zip_path, max_len)
 
         elif choice == '3':
-            create_protected_zip()
-
-        elif choice == '4':
             print("Au revoir.")
             break
         else:
