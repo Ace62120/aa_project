@@ -12,13 +12,14 @@ import string
 # -------- Banner --------
 def show_banner():
     cprint(r"""
-     █████╗  █████╗     ██████╗  ██████╗      ██████╗ ██████╗      
-    ██╔══██╗██╔══██╗    ██╔══██╗██╔═══██╗    ██╔════╝██╔═══██╗     
-    ███████║███████║    ██████╔╝██║   ██║    ██║     ██║   ██║     
-    ██╔══██║██╔══██║    ██╔═══╝ ██║   ██║    ██║     ██║   ██║     
-    ██║  ██║██║  ██║    ██║     ╚██████╔╝    ╚██████╗╚██████╔╝     
-    ╚═╝  ╚═╝╚═╝  ╚═╝    ╚═╝      ╚═════╝      ╚═════╝ ╚═════╝      
-                Version 1.0.0 | Port Scanner + Zip Cracker
+ █████╗  █████╗       ██████╗ ██████╗       ██████╗ ██████╗
+██╔══██╗██╔══██╗     ██╔═══██╗██╔══██╗     ██╔════╝██╔═══██╗
+███████║███████║     ██║   ██║██████╔╝     ██║     ██║   ██║
+██╔══██║██╔══██║     ██║   ██║██╔═══╝      ██║     ██║   ██║
+██║  ██║██║  ██║     ╚██████╔╝██║          ╚██████╗╚██████╔╝
+╚═╝  ╚═╝╚═╝  ╚═╝      ╚═════╝ ╚═╝           ╚═════╝ ╚═════╝
+
+            Version 1.0.0 | Port Scanner + Zip Cracker
     """, 'red')
 
 # -------- Port Scanner --------
@@ -75,45 +76,6 @@ def crack_zip_exhaustive(zip_path, max_length=4):
         print("[-] Fichier ZIP introuvable.")
     return False
 
-# -------- Menu Interface --------
-def main():
-    show_banner()
-    while True:
-        print("\nMenu:")
-        print("1. Scanner des ports")
-        print("2. Bruteforce de fichier ZIP")
-        print("3. Quitter")
-        choice = input("\n[?] Choix: ")
-
-        if choice == '1':
-            target = input("Entrer l'adresse IP ou le nom d'hôte à scanner: ")
-            port_input = input("Entrer les ports à scanner (ex: 22,80,443) ou laisser vide pour les ports par défaut: ")
-            if port_input.strip():
-                ports = list(map(int, port_input.split(',')))
-            else:
-                ports = [21, 22, 23, 25, 53, 80, 110, 139, 143, 443, 445, 8080]
-            scan_ports(target, ports)
-
-        elif choice == '2':
-            zip_path = input("Chemin vers le fichier ZIP: ")
-            mode = input("Mode (1: wordlist / 2: bruteforce total): ")
-            if mode == '1':
-                wordlist_path = input("Chemin vers la wordlist: ")
-                crack_zip(zip_path, wordlist_path)
-            elif mode == '2':
-                max_len = int(input("Longueur max du mot de passe (ex: 4): "))
-                crack_zip_exhaustive(zip_path, max_len)
-
-        elif choice == '3':
-            print("Au revoir.")
-            break
-        else:
-            print("Option invalide, réessaye.")
-
-if __name__ == "__main__":
-    main()
-
-
 # -------- Générer un ZIP protégé --------
 def create_protected_zip():
     try:
@@ -136,7 +98,7 @@ def create_protected_zip():
     except Exception as e:
         print(f"[-] Erreur : {e}")
 
-# Mise à jour du menu
+# -------- Menu Interface --------
 def main():
     show_banner()
     while True:
@@ -174,3 +136,6 @@ def main():
             break
         else:
             print("Option invalide, réessaye.")
+
+if __name__ == "__main__":
+    main()
