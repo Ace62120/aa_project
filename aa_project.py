@@ -112,3 +112,65 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# -------- Générer un ZIP protégé --------
+def create_protected_zip():
+    try:
+        import pyminizip
+    except ImportError:
+        print("[-] Le module 'pyminizip' est requis. Installe-le avec : pip install pyminizip")
+        return
+
+    file_path = input("Chemin du fichier à zipper : ")
+    if not os.path.isfile(file_path):
+        print("[-] Fichier introuvable.")
+        return
+
+    zip_name = input("Nom du fichier ZIP de sortie : ")
+    password = input("Mot de passe : ")
+
+    try:
+        pyminizip.compress(file_path, None, zip_name, password, 5)
+        cprint(f"[+] ZIP protégé créé : {zip_name}", "red")
+    except Exception as e:
+        print(f"[-] Erreur : {e}")
+
+# Mise à jour du menu
+def main():
+    show_banner()
+    while True:
+        print("\nMenu:")
+        print("1. Scanner des ports")
+        print("2. Bruteforce de fichier ZIP")
+        print("3. Générer un ZIP protégé par mot de passe")
+        print("4. Quitter")
+        choice = input("\n[?] Choix: ")
+
+        if choice == '1':
+            target = input("Entrer l'adresse IP ou le nom d'hôte à scanner: ")
+            port_input = input("Entrer les ports à scanner (ex: 22,80,443) ou laisser vide pour les ports par défaut: ")
+            if port_input.strip():
+                ports = list(map(int, port_input.split(',')))
+            else:
+                ports = [21, 22, 23, 25, 53, 80, 110, 139, 143, 443, 445, 8080]
+            scan_ports(target, ports)
+
+        elif choice == '2':
+            zip_path = input("Chemin vers le fichier ZIP: ")
+            mode = input("Mode (1: wordlist / 2: bruteforce total): ")
+            if mode == '1':
+                wordlist_path = input("Chemin vers la wordlist: ")
+                crack_zip(zip_path, wordlist_path)
+            elif mode == '2':
+                max_len = int(input("Longueur max du mot de passe (ex: 4): "))
+                crack_zip_exhaustive(zip_path, max_len)
+
+        elif choice == '3':
+            create_protected_zip()
+
+        elif choice == '4':
+            print("Au revoir.")
+            break
+        else:
+            print("Option invalide, réessaye.")
